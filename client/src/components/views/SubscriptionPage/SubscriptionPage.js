@@ -12,9 +12,7 @@ const SubscriptionPage = () => {
 
     const [Videos, setVideos] = useState([]);
 
-    const subscriptionVariables = {
-        userFrom : localStorage.getItem("userId")
-    };
+    const subscriptionVariables = { userFrom : localStorage.getItem("userId") };
 
     useEffect(() => {
         Axios.post('/api/video/getSubscriptionVideos', subscriptionVariables)
@@ -59,9 +57,9 @@ const SubscriptionPage = () => {
 
     return (
         <div style={{ width: '85%', margin: '3rem auto' }}>
-            <Title level={2}>Recommended</Title>
+            <Title level={2}> Subscribed Videos </Title>
             <hr/>
-            <Row gutter={[32, 16]}>
+            <Row gutter={16}>
                 {renderCards}
             </Row>
         </div>

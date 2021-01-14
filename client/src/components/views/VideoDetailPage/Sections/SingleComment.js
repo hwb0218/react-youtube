@@ -5,7 +5,8 @@ import { useSelector } from "react-redux";
 
 const { TextArea } = Input;
 
-const SingleComment = ({ videoId }) => {
+const SingleComment = ({ videoId, comment, refreshFunction }) => {
+    console.log(comment);
     const user = useSelector(state => state.user);
     const [commentValue, setCommentValue] = useState('');
     const [openReply, setOpenReply] = useState(false);
@@ -25,12 +26,18 @@ const SingleComment = ({ videoId }) => {
             content: commentValue,
             writer: user.userData._id,
             videoId,
-            responseTo
+            responseTo: comment._id
         };
 
         Axios.post('/api/comment/saveComment', variables)
             .then(response => {
-                response.data.success ? console.log(response.data.result) : alert('코멘트를 저장하지 못했습니다.');
+                if (response.data.success) {
+                    refreshFunction(response.data.result);
+                    setCommentValue("");
+                    setOpenReply(false);
+                } else {
+                    alert("코멘트 정보를 가져올 수 없습니다.");
+                }
             });
     };
 
@@ -38,17 +45,23 @@ const SingleComment = ({ videoId }) => {
         setCommentValue(e.currentTarget.value);
     }
 
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            onSubmit(e);
+        }
+    }
+
     return (
         <div>
             <Comment
                 actions={actions}
-                author
-                avatar={<Avatar src alt />}
-                content
+                author={comment.writer.name}
+                avatar={<Avatar src={comment.writer.image} alt="avatar" />}
+                content={<p>{comment.content}</p>}
             />
 
             {openReply &&
-                <form style={{ display: 'flex' }} onSubmit={onSubmit}>
+                <form style={{ display: 'flex' }} onKeyPress={handleKeyPress}>
                     <TextArea
                         style={{ width: '100%', borderRadius: '5px' }}
                         onChange={handleChange}

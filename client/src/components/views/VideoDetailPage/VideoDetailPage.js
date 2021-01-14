@@ -8,16 +8,19 @@ import './VideoDetailPage.css';
 
 const VideoDetailPage = ({ match }) => {
 
-    const [VideoDetail, setVideoDetail] = useState([]);
     const videoId = match.params.videoId;
+
     const variables = { videoId };
+
+    const [VideoDetail, setVideoDetail] = useState([]);
+    const [comments, setComments] = useState([]);
 
     useEffect(() => {
         Axios.post('/api/video/getVideoDetail', variables)
             .then(response => {
                 if (response.data.success) {
-                    console.log(response.data);
                     setVideoDetail(response.data.videoDetail);
+                    console.log(response.data.videoDetail);
                 } else {
                     alert("비디오 정보를 가져올 수 없습니다.");
                 }
@@ -26,12 +29,17 @@ const VideoDetailPage = ({ match }) => {
         Axios.post('/api/comment/getComments', variables)
             .then(response => {
                 if (response.data.success) {
-                    console.log(response.data);
+                    setComments(response.data.comments);
+                    console.log(response.data.comments);
                 } else {
                     alert("코멘트 정보를 가져올 수 없습니다.");
                 }
             });
     }, []);
+
+    const updateComment = (newComment) => {
+        setComments(comments.concat(newComment));
+    }
 
     if (VideoDetail.writer) {
         const subscribeButton = VideoDetail.writer._id !== localStorage.getItem('userId') && <Subscribe userTo={VideoDetail.writer._id} userFrom={localStorage.getItem('userId')} />
@@ -50,7 +58,7 @@ const VideoDetailPage = ({ match }) => {
                         </List.Item>
 
                         {/*comments*/}
-                        <Comment />
+                        <Comment refreshFunction={updateComment} commentLists={comments} videoId={videoId} />
                     </div>
                 </Col>
                 <Col lg={6} xs={24}>

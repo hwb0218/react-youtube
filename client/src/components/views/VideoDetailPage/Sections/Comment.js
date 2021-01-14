@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
+import { Button, Input } from 'antd';
 import Axios from "axios";
 import { useSelector } from 'react-redux';
 import SingleComment from "./SingleComment";
+import ReplyComment from "./ReplyComment";
 
-const Comment = ({ videoId }) => {
+const { TextArea } = Input;
+
+const Comment = ({ videoId, commentLists, refreshFunction }) => {
     const user = useSelector(state => state.user);
     const [commentValue, setCommentValue] = useState('');
 
@@ -12,6 +16,7 @@ const Comment = ({ videoId }) => {
     }
 
     const onSubmit = (e) => {
+        e.preventDefault();
 
         const variables = {
             content: commentValue,
@@ -19,11 +24,21 @@ const Comment = ({ videoId }) => {
             videoId
         };
 
-        e.preventDefault();
         Axios.post('/api/comment/saveComment', variables)
             .then(response => {
-                response.data.success ? console.log(response.data.result) : alert('코멘트를 저장하지 못했습니다.');
+                if (response.data.success) {
+                    refreshFunction(response.data.result);
+                    setCommentValue("");
+                } else {
+                    alert("코멘트 정보를 가져올 수 없습니다.");
+                }
             });
+    }
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            onSubmit(e);
+        }
     }
 
     return (
@@ -33,16 +48,26 @@ const Comment = ({ videoId }) => {
             <hr/>
 
             {/*Comment Lists*/}
-            <SingleComment videoId={videoId} />
+            {commentLists && commentLists.map((comment, index) => (
+                (!comment.responseTo &&
+                    <Fragment>
+                    <SingleComment refreshFunction={refreshFunction} comment={comment} videoId={videoId} />
+                    <ReplyComment refreshFunction={refreshFunction} parentCommentId={comment._id} commentLists={commentLists} videoId={videoId} />
+                    </Fragment>
+                )
+            ))}
+
+
             {/*Root Comment Form*/}
-            <form style={{ display: 'flex' }} onSubmit={onSubmit}>
-                <textarea style={{ width: '100%', borderRadius: '5px' }}
+            <form style={{ display: 'flex' }} onKeyPress={handleKeyPress}>
+                <TextArea
+                    style={{ width: '100%', borderRadius: '5px' }}
                     onChange={handleChange}
                     value={commentValue}
                     placeholder="코멘트를 작성해 주세요"
                 />
                 <br/>
-                <button style={{ width: '20%', height: '52px' }} onClick={onSubmit}>Submit</button>
+                <Button style={{ width: '20%', height: '52px' }} onClick={onSubmit}>Submit</Button>
             </form>
         </div>
     );
