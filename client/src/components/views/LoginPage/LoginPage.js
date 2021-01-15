@@ -44,7 +44,6 @@ function LoginPage(props) {
 
           dispatch(loginUser(dataToSubmit))
             .then(response => {
-              console.log('login response..........',response);
               if (response.payload.loginSuccess) {
                 window.localStorage.setItem('userId', response.payload.userId);
                 if (rememberMe === true) {

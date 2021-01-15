@@ -37,8 +37,8 @@ const ReplyComment = ({ refreshFunction, commentLists, parentCommentId, videoId 
     return (
         <div>
             {childCommentNumber > 0 &&
-                <p style={{ fontSize: '14px', margin: 0, color: 'gray' }} onClick={onHandleChange}>
-                    View {childCommentNumber} more comment(s)
+                <p style={{ fontSize: '14px', margin: 0, color: 'gray', cursor: 'pointer' }} onClick={onHandleChange}>
+                    {!openReplyComments ? <span>답글 {childCommentNumber}개</span> : <span>답글 숨기기</span>} 
                 </p>
             }
 

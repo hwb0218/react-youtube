@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { Comment, Avatar, Button, Input } from 'antd';
 import Axios from "axios";
 import { useSelector } from "react-redux";
+import LikeDislikes from "./LikeDislikes";
 
 const { TextArea } = Input;
 
@@ -15,8 +16,8 @@ const SingleComment = ({ videoId, comment, refreshFunction }) => {
         setOpenReply(!openReply);
     }
 
-    const actions = [
-        <span onClick={onClickReplyOpen} key="comment-basic-reply-to">Reply to</span>
+    const actions = [<LikeDislikes userId={localStorage.getItem('userId')} commentId={comment._id}/>,
+        <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={onClickReplyOpen} key="comment-basic-reply-to">Reply to</div>
     ]
 
     const onSubmit = (e) => {
